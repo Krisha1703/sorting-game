@@ -149,7 +149,7 @@ const BubbleSortPractice = () => {
               }`}
               onClick={() => handleActionClick("Don't Swap")}
             >
-              DON'T SWAP
+              DON&apos;T SWAP
             </button>
           </div>
         </div>
