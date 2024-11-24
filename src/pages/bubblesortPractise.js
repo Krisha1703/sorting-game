@@ -167,14 +167,21 @@ const BubbleSortPractice = () => {
           )}
 
           {/* Next Button */}
-          <Link href="/bubblesortChallenge">
-            <button
-              className="bg-yellow-300 rounded-full px-6 py-3 text-xl font-bold text-green-900 shadow-md hover:bg-yellow-400 hover:text-green-700"
-              onClick={handleNextClick}
-            >
-              NEXT
-            </button>
-          </Link>
+          <button
+            className="bg-yellow-300 rounded-full px-6 py-3 text-xl font-bold text-green-900 shadow-md hover:bg-yellow-400 hover:text-green-700"
+            onClick={handleNextClick}
+          >
+            NEXT
+          </button>
+
+          {/* Challenge Time Button - Only shows when numbers are sorted */}
+          {sorted && (
+            <Link href="/bubblesortChallenge">
+              <button className="bg-orange-400 rounded-full px-6 py-3 text-xl font-bold text-white shadow-md hover:bg-orange-500 mt-4">
+                CHALLENGE TIME
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

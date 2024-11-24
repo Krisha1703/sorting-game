@@ -10,14 +10,15 @@ const BubbleSortLevelOne = () => {
   const [elapsedTime, setElapsedTime] = useState(0); // Timer in seconds
   const [timerInterval, setTimerInterval] = useState(null); // Store interval for clearing it
 
+  // Define generateBars function outside of useEffect so it's accessible everywhere
+  const generateBars = (count) => 
+    Array.from({ length: count }, (_, index) => ({
+      value: Math.floor(Math.random() * 100) + 10,
+      color: "gray", // Initially all bars are gray
+    }));
+
   // Generate bars on component mount
   useEffect(() => {
-    const generateBars = (count) =>
-      Array.from({ length: count }, (_, index) => ({
-        value: Math.floor(Math.random() * 100) + 10,
-        color: "gray", // Initially all bars are gray
-      }));
-
     setBars(generateBars(6));
   }, []);
 
