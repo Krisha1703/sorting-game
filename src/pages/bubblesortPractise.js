@@ -101,7 +101,7 @@ const BubbleSortPractice = () => {
           {/* Back Button */}
           <div className="self-start">
             <Link href="/bubbleSortTutorial">
-              <button className="border-solid border-2 border-yellow-400 text-yellow-400 rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-md hover:bg-yellow-400">
+              <button className="border-solid border-2 border-yellow-400 text-yellow-400 rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-md hover:bg-yellow-400 hover:text-green-700">
                 &#x2190;
               </button>
             </Link>
@@ -167,12 +167,14 @@ const BubbleSortPractice = () => {
           )}
 
           {/* Next Button */}
-          <button
-            className="bg-yellow-300 rounded-full px-6 py-3 text-xl font-bold text-green-900 shadow-md hover:bg-yellow-400"
-            onClick={handleNextClick}
-          >
-            NEXT
-          </button>
+          <Link href="/bubblesortChallenge">
+            <button
+              className="bg-yellow-300 rounded-full px-6 py-3 text-xl font-bold text-green-900 shadow-md hover:bg-yellow-400 hover:text-green-700"
+              onClick={handleNextClick}
+            >
+              NEXT
+            </button>
+          </Link>
         </div>
       </div>
     </div>
