@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Start() {
   const router = useRouter();
@@ -14,12 +15,9 @@ export default function Start() {
     >
       {/* Text and Button Layer */}
       <div className="absolute top-[12vh] left-[22vw] w-full h-full flex flex-col justify-center items-center text-white">
-        <button
-          onClick={handleStartClick}
-          className="bg-green-600 rounded-md p-4 text-white w-1/6 text-xl shadow-lg hover:bg-green-700"
-        >
-          START
-        </button>
+        
+        <Image src="/start.png" width={250} height={250} alt="start" onClick={handleStartClick} className="cursor-pointer pointer-xl"/>
+       
       </div>
     </div>
   );

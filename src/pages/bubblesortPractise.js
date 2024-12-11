@@ -1,187 +1,251 @@
-"use client";
-
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router"; // Import the useRouter hook
 import Image from "next/image";
 import "../app/globals.css";
 
 const BubbleSortPractice = () => {
-  // State to manage action selection, sorting, and messages
+  const router = useRouter(); // Initialize the router
   const [action, setAction] = useState(null);
-  const [step, setStep] = useState(0); // Tracks current step of the sorting process
-  const [numbers, setNumbers] = useState([5, 3, 4, 2, 1]); // Numbers to sort
-  const [sorted, setSorted] = useState(false); // Flag to check if the numbers are sorted
-  const [message, setMessage] = useState("Compare the first two elements."); // Message for user feedback
-  const [feedbackImage, setFeedbackImage] = useState(null); // State for feedback image
+  const [message, setMessage] = useState("Compare the first two elements.");
+  const [feedbackImage, setFeedbackImage] = useState(null);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort");
+  const [nextButtonOpacity, setNextButtonOpacity] = useState(1);
+  const [swapButtonOpacity, setSwapButtonOpacity] = useState(0.5);
+  const [dontSwapButtonOpacity, setDontSwapButtonOpacity] = useState(0.5);
+  const [nextClicked, setNextClicked] = useState(false);
+  const [highlightedImages, setHighlightedImages] = useState([false, false]);
+  const [currentIndex, setCurrentIndex] = useState(-1); // Track the current pair being compared
+  const [numbers, setNumbers] = useState([5, 3, 4, 2, 1]);
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isSorted, setIsSorted] = useState(false);
+  const [images, setImages] = useState([ "/5.png", "/3.png", "/4.png", "/2.png", "/1.png" ]);
 
-  // Handle button clicks for actions (Swap / Don't Swap)
-  const handleActionClick = (selectedAction) => {
-    setAction(selectedAction);
+  const handleOptionClick = (algorithm) => {
+    setSelectedAlgorithm(algorithm);
   };
 
-  // Handle the 'Next' button click to move to the next comparison
-  const handleNextClick = () => {
-    const newNumbers = [...numbers];
-    const currentStep = step;
+  const getImageSrc = (algorithm) => {
+    return selectedAlgorithm === algorithm
+      ? `/${algorithm.replace(/ /g, " ")}_AF.png`
+      : `/${algorithm.replace(/ /g, " ")}_BF.png`;
+  };
 
-    if (currentStep < numbers.length - 1) {
-      // Compare the current pair
-      if (newNumbers[currentStep] > newNumbers[currentStep + 1]) {
-        // If the first number is greater, they should swap
-        if (action === "Swap") {
-          newNumbers[currentStep] = numbers[currentStep + 1];
-          newNumbers[currentStep + 1] = numbers[currentStep];
-          setNumbers(newNumbers);
-          setMessage(`Correct! Swapped ${numbers[currentStep]} and ${numbers[currentStep + 1]}.`);
-          setFeedbackImage("/yellow-star.webp"); // Show yellow star for correct swap
-        } else {
-          setMessage(`Oops! ${numbers[currentStep]} is greater than ${numbers[currentStep + 1]}, so we swap.`);
-          setFeedbackImage("/red-cross.webp"); // Show red cross for incorrect action
-        }
-      } else {
-        // No swap needed
-        if (action === "Don't Swap") {
-          setMessage(`Correct! No swap needed between ${numbers[currentStep]} and ${numbers[currentStep + 1]}.`);
-          setFeedbackImage("/yellow-star.webp"); // Show yellow star for correct action
-        } else {
-          setMessage(`Oops! No need to swap ${numbers[currentStep]} and ${numbers[currentStep + 1]}.`);
-          setFeedbackImage("/red-cross.webp"); // Show red cross for incorrect action
+  
+  const handleNextClick = () => {
+    setNextClicked(true);
+    setNextButtonOpacity(0.5);
+    setSwapButtonOpacity(1);
+    setDontSwapButtonOpacity(1);
+  
+    // If we've reached the last comparison in the current pass
+    if (currentIndex >= numbers.length - 2) {
+      // Check if the list is sorted
+      let isSorted = true;
+      for (let i = 0; i < numbers.length - 1; i++) {
+        if (numbers[i] > numbers[i + 1]) {
+          isSorted = false;
+          break;
         }
       }
-
-      // Move to the next pair of elements
-      setStep(step + 1);
-    } else {
-      // Once the first pass is done, we reset and check the array
-      setStep(0);
-      setSorted(isSorted(newNumbers));
-
-      if (isSorted(newNumbers)) {
-        setMessage("Great! All elements are in their correct position. Ready for more practice?");
+  
+      if (isSorted) {
+        setMessage("Congratulations! The list is fully sorted.");
+        setNextButtonOpacity(1); // Disable the Next button
+        setDontSwapButtonOpacity(0.5);
+        setSwapButtonOpacity(0.5);
+        setIsSorted(true);
+        router.push("/bubblesortChallenge");
+        return;
       } else {
-        setMessage("Resetting and checking again...");
-        setNumbers(newNumbers); // Recheck the numbers
+        setMessage("End of this round. Restarting the comparison.");
+        setNextButtonOpacity(1);
+        setDontSwapButtonOpacity(0.5);
+        setSwapButtonOpacity(0.5);
+        setCurrentIndex(-1); // Restart from the first two numbers
+        setHighlightedImages([true, false]); // Highlight the first two numbers
+        return;
       }
     }
+  
+    // Continue to the next pair
+    setHighlightedImages([currentIndex + 1, currentIndex + 2]); // Highlight the next pair
+    setMessage(
+      `Compare ${numbers[currentIndex + 1]} and ${numbers[currentIndex + 2]}`
+    );
+    setCurrentIndex(currentIndex + 1);
   };
-
-  // Function to check if the numbers are sorted
-  const isSorted = (nums) => {
-    return nums.every((num, idx) => idx === 0 || num >= nums[idx - 1]);
+  
+  const handleSwapDontSwapClick = (swap) => {
+    const firstNumber = numbers[currentIndex];
+    const secondNumber = numbers[currentIndex + 1];
+  
+    if (swap) {
+      if (firstNumber > secondNumber) {
+        setMessage(`Great, ${firstNumber} > ${secondNumber}. Swapping.`);
+        setFeedbackImage("/yellow-star.webp");
+  
+        // Swap the numbers
+        const newNumbers = [...numbers];
+        newNumbers[currentIndex] = secondNumber;
+        newNumbers[currentIndex + 1] = firstNumber;
+        setNumbers(newNumbers);
+  
+        // Update images accordingly
+        const newImages = [...images];
+        newImages[currentIndex] = `/${secondNumber}.png`;
+        newImages[currentIndex + 1] = `/${firstNumber}.png`;
+        setImages(newImages);
+      } else {
+        setMessage("No swap needed; numbers are already in order.");
+        setFeedbackImage("/yellow-star.webp");
+      }
+    } else {
+      if (firstNumber <= secondNumber) {
+        setMessage("Correct! No swap needed.");
+        setFeedbackImage("/yellow-star.webp");
+      } else {
+        setMessage("Oops, a swap was needed. Try again.");
+        setFeedbackImage("/red-cross.webp");
+      }
+    }
+  
+    // Reset button opacity
+    setNextButtonOpacity(1);
+    setSwapButtonOpacity(0.5);
+    setDontSwapButtonOpacity(0.5);
   };
+  
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  
   return (
     <div
       className="relative w-full h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/algorithms-bg.png')" }}
     >
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed top-10 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative">
+            <Image
+              src="/popup_bubble.png"
+              alt="Bubble Sort Modal"
+              width={1200}
+              height={1200}
+              className="cursor-pointer"
+              onClick={closeModal}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Sorting Options */}
       <div className="flex space-x-4 text-xl font-semibold py-10 mx-10">
-        <button
-          className={`rounded-full p-2 px-4 bg-green-600 text-white`}
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Bubble Sort")}
         >
-          Bubble Sort
-        </button>
-        <button
-          className={`rounded-full p-2 px-4 bg-gray-500 text-white`}
+          <Image
+            src={getImageSrc("Bubble Sort")}
+            alt="Bubble Sort"
+            width={250}
+            height={250}
+            className="rounded-full"
+          />
+        </div>
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Insertion Sort")}
         >
-          Insertion Sort
-        </button>
-        <button
-          className={`rounded-full p-2 px-4 bg-gray-500 text-white`}
+          <Image
+            src={getImageSrc("Insertion Sort")}
+            alt="Insertion Sort"
+            width={250}
+            height={250}
+            className="rounded-full"
+          />
+        </div>
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Selection Sort")}
         >
-          Selection Sort
-        </button>
+          <Image
+            src={getImageSrc("Selection Sort")}
+            alt="Selection Sort"
+            width={250}
+            height={250}
+            className="rounded-full"
+          />
+        </div>
       </div>
 
       {/* Main Flex Container */}
       <div className="flex space-x-4 w-full max-w-5xl mx-auto">
         {/* Left Box: Numbers and Actions */}
-        <div className="bg-green-700 rounded-xl p-6 flex flex-col justify-between items-center w-1/2 text-white shadow-lg">
-          {/* Back Button */}
-          <div className="self-start">
-            <Link href="/bubbleSortTutorial">
-              <button className="border-solid border-2 border-yellow-400 text-yellow-400 rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-md hover:bg-yellow-400 hover:text-green-700">
-                &#x2190;
-              </button>
-            </Link>
+        <div className="bg-green-700 border-dashed border-[#66FF00] border-4 rounded-xl p-6 flex flex-col justify-between items-center w-1/2 text-white shadow-lg">
+          <div className="flex space-x-6 my-5">
+            {images.map((imgSrc, idx) => (
+              <Image
+                key={idx}
+                src={imgSrc}
+                width={64}
+                height={64}
+                alt={`number-${numbers[idx]}`}
+                className={`rounded-full ${
+                  isSorted 
+                    ? "border-green-500 border-4 border-solid" 
+                    : nextClicked && highlightedImages.includes(idx)
+                    ? "border-yellow-500 border-4 border-solid"
+                    : ""
+                }`}                
+              />
+            ))}
           </div>
 
-          {/* Row of Elements */}
-          <div className="flex space-x-6 my-10">
-            {numbers.map((num, index) => {
-              const isHighlighted = step === index || step === index + 1; // Highlight the two numbers being compared
-              const isSortedItem = sorted && num === numbers[index]; // Check if the element is in its sorted position
-              return (
-                <div
-                  key={index}
-                  className={`w-16 h-16 bg-white text-green-900 rounded-full flex items-center justify-center text-xl font-bold border-4 ${
-                    isHighlighted
-                      ? "border-yellow-500 shadow-xl"
-                      : isSortedItem
-                      ? "border-green-500 shadow-xl"
-                      : "border-green-800 shadow-lg"
-                  }`}
-                >
-                  {num}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Swap and Don't Swap Buttons */}
           <div className="flex space-x-10 mt-6">
-            <button
-              className={`w-36 h-14 rounded-full text-white text-lg font-bold shadow-md transition ${
-                action === "Swap"
-                  ? "bg-blue-700"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
-              onClick={() => handleActionClick("Swap")}
-            >
-              SWAP
-            </button>
-            <button
-              className={`w-36 h-14 rounded-full text-white text-lg font-bold shadow-md transition ${
-                action === "Don't Swap"
-                  ? "bg-red-700" // Red background for "Don't Swap"
-                  : "bg-red-600 hover:bg-red-700"
-              }`}
-              onClick={() => handleActionClick("Don't Swap")}
-            >
-              DON&apos;T SWAP
-            </button>
+            <Image
+              src="/swap.png"
+              alt="Swap"
+              width={200}
+              height={200}
+              className="cursor-pointer"
+              style={{ opacity: swapButtonOpacity }}
+              onClick={() => handleSwapDontSwapClick(true)}
+            />
+            <Image
+              src="/dont swap.png"
+              alt="Don't Swap"
+              width={200}
+              height={200}
+              className="cursor-pointer"
+              style={{ opacity: dontSwapButtonOpacity }}
+              onClick={() => handleSwapDontSwapClick(false)}
+            />
           </div>
         </div>
 
         {/* Right Box: Text, Next Button, and Feedback Image */}
-        <div className="bg-green-700 rounded-xl p-6 flex flex-col justify-center items-center w-1/3 text-white shadow-lg">
-          {/* Dynamic Instruction */}
+        <div className="bg-green-700 border-dashed border-[#66FF00] border-4 rounded-xl p-6 flex flex-col justify-center items-center w-1/3 text-white shadow-lg">
           <p className="text-xl font-semibold text-center mb-6">{message}</p>
 
-          {/* Feedback Image (Yellow Star or Red Cross) */}
           {feedbackImage && (
             <div className="mb-4">
               <Image src={feedbackImage} width={75} height={75} alt="Feedback" />
             </div>
           )}
 
-          {/* Next Button */}
-          <button
-            className="bg-yellow-300 rounded-full px-6 py-3 text-xl font-bold text-green-900 shadow-md hover:bg-yellow-400 hover:text-green-700"
+          <Image
+            src="/next.png"
+            width={150}
+            height={150}
+            alt="Next"
+            className="cursor-pointer"
+            style={{ opacity: nextButtonOpacity }}
             onClick={handleNextClick}
-          >
-            NEXT
-          </button>
-
-          {/* Challenge Time Button - Only shows when numbers are sorted */}
-          {sorted && (
-            <Link href="/bubblesortChallenge">
-              <button className="bg-orange-400 rounded-full px-6 py-3 text-xl font-bold text-white shadow-md hover:bg-orange-500 mt-4">
-                CHALLENGE TIME
-              </button>
-            </Link>
-          )}
+          />
         </div>
       </div>
     </div>

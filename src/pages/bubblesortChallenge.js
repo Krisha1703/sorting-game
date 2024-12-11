@@ -1,61 +1,89 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import { useRouter } from "next/navigation";
 import "../app/globals.css";
 import Link from "next/link";
+import Image from "next/image";
 
 const BubbleSortChallenge = () => {
 
     const router = useRouter();
 
   const handleStartClick = () => {
-    router.push("/bubblesortLevels");
+    router.push("/BubbleSortLevelOne");
   };
 
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort"); // Default selection is Bubble Sort
+
+  const handleOptionClick = (algorithm) => {
+    setSelectedAlgorithm(algorithm); // Update selected algorithm
+  };
+
+  const getImageSrc = (algorithm) => {
+    // Determine the image source based on selection
+    return selectedAlgorithm === algorithm
+      ? `/${algorithm.replace(/ /g, " ")}_AF.png` // Selected state (AF)
+      : `/${algorithm.replace(/ /g, " ")}_BF.png`; // Default state (BF)
+  };
   return (
     <div
       className="relative w-full h-screen bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('/algorithms-bg.png')" }}
+      style={{ backgroundImage: "url('/bubble-challenge.svg')" }}
     >
       {/* Sorting Options */}
-      <div className="flex space-x-4 text-xl font-semibold py-10 mx-10">
-        <button
-          className={`rounded-full p-2 px-4 bg-green-600 text-white`}
+      <div className="flex space-x-4 text-xl font-semibold py-0 -mt-6 mx-10">
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Bubble Sort")}
         >
-          Bubble Sort
-        </button>
-        <button
-          className={`rounded-full p-2 px-4 bg-gray-500 text-white`}
+          <Image
+            src={getImageSrc("Bubble Sort")}
+            alt="Bubble Sort"
+            width={200}
+            height={200}
+            className="rounded-full"
+          />
+        </div>
+
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Insertion Sort")}
         >
-          Insertion Sort
-        </button>
-        <button
-          className={`rounded-full p-2 px-4 bg-gray-500 text-white`}
+          <Image
+            src={getImageSrc("Insertion Sort")}
+            alt="Insertion Sort"
+            width={200}
+            height={200}
+            className="rounded-full"
+          />
+        </div>
+
+        <div
+          className="cursor-pointer"
+          onClick={() => handleOptionClick("Selection Sort")}
         >
-          Selection Sort
-        </button>
+          <Image
+            src={getImageSrc("Selection Sort")}
+            alt="Selection Sort"
+            width={200}
+            height={200}
+            className="rounded-full"
+          />
+        </div>
       </div>
 
-        <div className="bg-green-700 rounded-xl p-6 mx-auto flex flex-col justify-between items-center w-3/4 text-white shadow-lg">
+        
           {/* Back Button */}
-          <div className="self-start">
+          <div className="self-start mx-[10vw]">
             <Link href="/bubbleSortTutorial">
               <button className="border-solid border-2 border-yellow-400 text-yellow-400 rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold shadow-md hover:bg-yellow-400 hover:text-green-700">
                 &#x2190;
               </button>
             </Link>
-          </div>
 
-        <div className="text-6xl text-center text-yellow-400 leading-[12vh]">
-            <h1>FINAL BUBBLE SORT CHALLENGE</h1> 
-        </div>
-        <button
-          onClick={handleStartClick}
-          className="bg-green-600 rounded-md p-4 text-white w-1/5 my-5 text-xl shadow-lg hover:bg-green-700"
-        >
-          START
-        </button>
+      <Image src="/start.png" width={250} height={250} alt="start" onClick={handleStartClick} className="cursor-pointer my-40 mx-auto"/>
+        
 
         </div>
       </div>
