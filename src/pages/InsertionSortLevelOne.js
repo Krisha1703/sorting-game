@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../app/globals.css";
 import Image from "next/image";
 
-const BubbleSortLevelOne = () => {
+const InsertionSortLevelOne = () => {
   const [bars, setBars] = useState([]);
   const [currentCompare, setCurrentCompare] = useState([0, 1]);
   const [isSorted, setIsSorted] = useState(false);
@@ -180,8 +180,8 @@ const BubbleSortLevelOne = () => {
       {/* Swap and Don't Swap buttons */}
       <div className="flex absolute bottom-0">
         <Image
-          src="/swap.png"
-          alt="Swap"
+          src="/left.png"
+          alt="Left"
           width={200}
           height={200}
           className="cursor-pointer"
@@ -191,8 +191,8 @@ const BubbleSortLevelOne = () => {
           }}
         />
         <Image
-          src="/dont swap.png"
-          alt="Don't Swap"
+          src="/fix.png"
+          alt="Fix"
           width={200}
           height={200}
           className="cursor-pointer"
@@ -327,4 +327,4 @@ const BubbleSortLevelOne = () => {
   );
 };
 
-export default BubbleSortLevelOne;
+export default InsertionSortLevelOne;

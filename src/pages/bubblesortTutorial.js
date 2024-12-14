@@ -4,12 +4,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import "../app/globals.css";
 import Image from "next/image";
+import { useRouter } from "next/router"; 
 
 const BubbleSortTutorial = () => {
+   const router = useRouter();
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort"); // Default selection is Bubble Sort
 
   const handleOptionClick = (algorithm) => {
     setSelectedAlgorithm(algorithm); // Update selected algorithm
+    const algo_page = algorithm.split(' ')[0].toLowerCase(); // Extract first word and convert to lowercase
+    router.push(`${algo_page}sortTutorial`);
   };
 
   const getImageSrc = (algorithm) => {

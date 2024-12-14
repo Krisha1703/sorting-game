@@ -6,15 +6,15 @@ import "../app/globals.css";
 import Link from "next/link";
 import Image from "next/image";
 
-const BubbleSortChallenge = () => {
+const InsertionSortChallenge = () => {
 
     const router = useRouter();
 
   const handleStartClick = () => {
-    router.push("/BubbleSortLevelOne");
+    router.push("/InsertionSortLevelOne");
   };
 
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort"); // Default selection is Bubble Sort
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Insertion Sort"); // Default selection is Bubble Sort
 
   const handleOptionClick = (algorithm) => {
     setSelectedAlgorithm(algorithm); // Update selected algorithm
@@ -29,7 +29,7 @@ const BubbleSortChallenge = () => {
   return (
     <div
       className="relative w-full h-screen bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('/bubble-challenge.svg')" }}
+      style={{ backgroundImage: "url('/insertion-challenge.svg')" }}
     >
       {/* Sorting Options */}
       <div className="flex space-x-4 text-xl font-semibold py-0 -mt-6 mx-10">
@@ -101,4 +101,4 @@ const BubbleSortChallenge = () => {
   );
 };
 
-export default BubbleSortChallenge;
+export default InsertionSortChallenge;

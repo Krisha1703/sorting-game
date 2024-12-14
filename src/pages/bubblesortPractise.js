@@ -19,10 +19,12 @@ const BubbleSortPractice = () => {
   const [numbers, setNumbers] = useState([5, 3, 4, 2, 1]);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isSorted, setIsSorted] = useState(false);
-  const [images, setImages] = useState([ "/5.png", "/3.png", "/4.png", "/2.png", "/1.png" ]);
+  const [images, setImages] = useState([ "/old numbers/5.png", "/old numbers/3.png", "/old numbers/4.png", "/old numbers/2.png", "/old numbers/1.png" ]);
 
   const handleOptionClick = (algorithm) => {
     setSelectedAlgorithm(algorithm);
+    const algo_page = algorithm.split(' ')[0].toLowerCase(); // Extract first word and convert to lowercase
+    router.push(`${algo_page}sortPractise`);
   };
 
   const getImageSrc = (algorithm) => {
@@ -93,8 +95,8 @@ const BubbleSortPractice = () => {
   
         // Update images accordingly
         const newImages = [...images];
-        newImages[currentIndex] = `/${secondNumber}.png`;
-        newImages[currentIndex + 1] = `/${firstNumber}.png`;
+        newImages[currentIndex] = `/old numbers/${secondNumber}.png`;
+        newImages[currentIndex + 1] = `/old numbers/${firstNumber}.png`;
         setImages(newImages);
       } else {
         setMessage("No swap needed; numbers are already in order.");
@@ -194,7 +196,7 @@ const BubbleSortPractice = () => {
                 width={64}
                 height={64}
                 alt={`number-${numbers[idx]}`}
-                className={`rounded-full ${
+                className={`rounded-full  ${
                   isSorted 
                     ? "border-green-500 border-4 border-solid" 
                     : nextClicked && highlightedImages.includes(idx)
