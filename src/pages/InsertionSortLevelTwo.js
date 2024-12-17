@@ -3,8 +3,8 @@ import "../app/globals.css";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-const InsertionSortLevelOne = () => {
-  const router = useRouter();
+const InsertionSortLevelTwo = () => {
+    const router = useRouter();
 
   const [bars, setBars] = useState([]);
   const [currentCompare, setCurrentCompare] = useState(0); // Index of the current bar being compared
@@ -20,7 +20,7 @@ const InsertionSortLevelOne = () => {
 
   // Generate initial bars on mount
   useEffect(() => {
-    setBars(generateBars(6));
+    setBars(generateBars(8));
     startTimer(); // Start the timer when the component loads
   }, []);
 
@@ -98,7 +98,7 @@ useEffect(() => {
 
     const interval = setInterval(() => {
       if (currentIndex >= bars.length - 1) {
-        clearInterval(interval); // Stop when all bars are 
+        clearInterval(interval); // Stop when all bars are handled
         setPLayerClimbed(true);
         return;
       }
@@ -108,7 +108,6 @@ useEffect(() => {
 
       currentIndex++; // Move to the next bar
     }, 500); // Adjust speed as needed
-   
 
     return () => clearInterval(interval); // Cleanup on unmount
   }
@@ -153,7 +152,7 @@ useEffect(() => {
 
       {/* Display Lives */}
       <div className="absolute top-0 left-0 p-4 flex gap-2">
-      <h1 className="text-2xl font-semibold mx-2">Level: 1</h1>
+      <h1 className="text-2xl font-semibold mx-2">Level: 2</h1>
         {Array.from({ length: 3 }, (_, index) => (
           <Image
             key={index}
@@ -258,7 +257,7 @@ useEffect(() => {
                   setElapsedTime(0); // Reset the timer
                   setPLayerClimbed(false); // Reset player climbing state
                   setFlagPosition(0); // Reset flag position
-                  setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+                  setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
                   startTimer(); // Restart the timer
                 }}
               />
@@ -327,7 +326,7 @@ useEffect(() => {
                   setElapsedTime(0); // Reset the timer
                   setPLayerClimbed(false); // Reset player climbing state
                   setFlagPosition(0); // Reset flag position
-                  setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+                  setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
                   startTimer(); // Restart the timer
                 }}
               />
@@ -347,7 +346,7 @@ useEffect(() => {
                 height={150}
                 alt="Next"
                 className="cursor-pointer"
-                onClick={() => router.push("/InsertionSortLevelTwo")}
+                onClick={() => router.push("/InsertionSortLevelThree")}
               />
             </div>
           </div>
@@ -359,4 +358,4 @@ useEffect(() => {
   );
 };
 
-export default InsertionSortLevelOne;
+export default InsertionSortLevelTwo;

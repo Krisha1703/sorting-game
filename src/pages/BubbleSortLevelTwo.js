@@ -3,7 +3,7 @@ import "../app/globals.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-const BubbleSortLevelOne = () => {
+const BubbleSortLevelTwo = () => {
   const router = useRouter();
 
   const [bars, setBars] = useState([]);
@@ -32,7 +32,7 @@ const BubbleSortLevelOne = () => {
   };
 
   useEffect(() => {
-    setBars(generateBars(6));
+    setBars(generateBars(8));
     startTimer();
   }, []);
 
@@ -66,7 +66,8 @@ const BubbleSortLevelOne = () => {
   const handleAction = (action) => {
     if (isSorted || bars.length === 0) return;
 
-    const [i, j] = currentCompare;
+    const [i, j] = Array.isArray(currentCompare) ? currentCompare : [0, 1];
+    ;
     const newBars = [...bars];
 
     // Reset all bars to grayscale except the ones being compared
@@ -174,7 +175,7 @@ useEffect(() => {
 
       {/* Display Lives */}
       <div className="absolute top-0 left-0 p-4 flex gap-2">
-      <h1 className="text-2xl font-semibold mx-2">Level: 1</h1>
+      <h1 className="text-2xl font-semibold mx-2">Level: 2</h1>
         {Array.from({ length: 3 }, (_, index) => (
           <Image
             key={index}
@@ -187,6 +188,7 @@ useEffect(() => {
         ))}
       </div>
 
+     
        {/* Winning flag */}
       <Image
         src="/player.png"
@@ -282,7 +284,7 @@ useEffect(() => {
             setElapsedTime(0); // Reset the timer
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
-            setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+            setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
             startTimer(); // Restart the timer
           }}
         />
@@ -351,7 +353,7 @@ useEffect(() => {
             setElapsedTime(0); // Reset the timer
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
-            setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+            setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
             startTimer(); // Restart the timer
           }}
         />
@@ -371,7 +373,7 @@ useEffect(() => {
           height={150}
           alt="Next"
           className="cursor-pointer"
-          onClick={() => router.push("/BubbleSortLevelTwo")}
+          onClick={() => router.push("/BubbleSortLevelThree")}
         />
       </div>
     </div>
@@ -383,4 +385,4 @@ useEffect(() => {
   );
 };
 
-export default BubbleSortLevelOne;
+export default BubbleSortLevelTwo;
