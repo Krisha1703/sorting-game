@@ -207,7 +207,7 @@ useEffect(() => {
           <span className="text-red-600">{score}</span>
         </h1>
       </div>
-      
+
       {/* Player Image */}
       <Image
         src="/player.png"
@@ -282,7 +282,7 @@ useEffect(() => {
             </h1>
       
             <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-            Time's up! Please try again.
+            Time is up! Please try again.
             </h3>
       
             {/* Retry and Home buttons */}

@@ -306,7 +306,7 @@ useEffect(() => {
       </h1>
 
       <h3 className="text-yellow-400 text-3xl  font-semibold ml-20 my-4">
-      Time's up! Please try again.
+      Time is up! Please try again.
       </h3>
 
       {/* Retry and Home buttons */}
