@@ -250,7 +250,7 @@ useEffect(() => {
 
        {/* Winning flag */}
       <Image
-        src="/player.png"
+        src="/hero.png"
         width={400}
         height={400}
         alt="player"

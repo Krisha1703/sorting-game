@@ -229,7 +229,7 @@ useEffect(() => {
 
       {/* Player Image */}
       <Image
-        src="/player.png"
+        src="/hero.png"
         width={400}
         height={400}
         alt="player"
