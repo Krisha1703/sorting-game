@@ -8,20 +8,22 @@ const InsertionSortLevelTwo = () => {
 
   const [bars, setBars] = useState([]);
   const [currentCompare, setCurrentCompare] = useState(0); // Index of the current bar being compared
-  const [elapsedTime, setElapsedTime] = useState(0); // Timer in seconds
+  const [elapsedTime, setElapsedTime] = useState(60); // Timer in seconds
   const [timerInterval, setTimerInterval] = useState(null); // Store interval for clearing it
   const [lives, setLives] = useState(3); // Tracking lives
   const [errorState, setErrorState] = useState(false); // To trigger screen flicker effect
   const [playerY, setPlayerY] = useState(0); // Initial Y position of the player
-  const [swapCount, setSwapCount] = useState(0);
+   const [isModalOpen, setIsModalOpen] = useState(true);
+      const [score, setScore] = useState(0); // Add a score state
+  
   const [flagPosition, setFlagPosition] = useState(0); // Track flag position
   const [isSorted, setIsSorted] = useState(false); // Flag to check if sorting is complete
   const [playerClimbed, setPLayerClimbed] = useState(false);
 
   // Generate initial bars on mount
   useEffect(() => {
-    setBars(generateBars(8));
-    startTimer(); // Start the timer when the component loads
+    setBars(generateBars(7));
+    setIsModalOpen(true);
   }, []);
 
   const generateBars = (count) =>
@@ -31,11 +33,27 @@ const InsertionSortLevelTwo = () => {
       sorted: false,
     }));
 
+    const closeModal = () => {
+      setIsModalOpen(false);
+      setElapsedTime(60); // Start with 45 seconds
+      startTimer();
+    };
+
     const startTimer = () => {
       if (timerInterval) return; // Prevent starting multiple intervals
-  
+    
       const interval = setInterval(() => {
-        setElapsedTime((prev) => prev + 1); // Increment the time every second
+        setElapsedTime((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval); // Stop timer when it reaches 0
+            setTimerInterval(null);
+            stopTimer();
+            // Trigger failure modal
+            setLives(0);
+            return 0;
+          }
+          return prev - 1; // Decrement time
+        });
       }, 1000);
       setTimerInterval(interval); // Store the interval ID to clear it later
     };
@@ -54,6 +72,7 @@ const InsertionSortLevelTwo = () => {
   const triggerError = () => {
     setErrorState(true);
     setLives((prev) => prev - 1);
+    setScore((prevScore) => prevScore - 5); // Add points for correct swap
 
     // Remove the flicker effect after a short delay
     setTimeout(() => {
@@ -73,6 +92,7 @@ const InsertionSortLevelTwo = () => {
 
     const newBars = [...bars];
     newBars[currentCompare].sorted = true; // Mark the current bar as sorted
+    setScore((prevScore) => prevScore + 10); 
     console.log("Sorted current bar at index: ", currentCompare);
     newBars[currentCompare].grayscale = 1; // Remove grayscale for the sorted bar
 
@@ -135,7 +155,7 @@ useEffect(() => {
 
     setBars(newBars);
     setCurrentCompare((prev) => prev - 1);
-    setSwapCount((prevCount) => prevCount + 1);
+    setScore((prevScore) => prevScore + 10); 
   };
 
   return (
@@ -145,6 +165,22 @@ useEffect(() => {
       }`}
       style={{ backgroundImage: "url('/sort-levels-bg.png')" }}
     >
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative">
+            <Image
+              src="/bubblesort-level2-modal.png"
+              alt="Bubble Sort Modal"
+              width={900}
+              height={900}
+              className="cursor-pointer rounded-2xl"
+            />
+            <button className="bg-green-500 text-white font-semibold p-3 absolute bottom-[11%] left-[45%] z-20 rounded-xl cursor-pointer" onClick={closeModal}>Save the princess!</button>
+          </div>
+        </div>
+      )}
+
       {/* Timer display */}
       <div className="absolute top-0 left-0 w-full text-center text-red-600 font-bold text-2xl p-2">
         {formatTime(elapsedTime)}
@@ -165,6 +201,13 @@ useEffect(() => {
         ))}
       </div>
 
+ {/* Display Score */}
+ <div className="absolute top-0 right-0 p-4 flex gap-2">
+        <h1 className="text-2xl font-semibold mx-2">Score: 
+          <span className="text-red-600">{score}</span>
+        </h1>
+      </div>
+      
       {/* Player Image */}
       <Image
         src="/player.png"
@@ -223,7 +266,7 @@ useEffect(() => {
 
       
         {/* Completion screen */}
-        {(lives === 0 || (bars.length > 0 && bars.every(bar => bar.grayscale === 1))) && (
+        {(lives === 0 && elapsedTime === 0 || (bars.length > 0 && bars.every(bar => bar.grayscale === 1))) && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div
             className="w-full h-full flex flex-col items-center justify-center p-12 bg-cover bg-no-repeat rounded-md"
@@ -239,7 +282,7 @@ useEffect(() => {
             </h1>
       
             <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-              Oops! Please try again or go back to practise game.
+            Time's up! Please try again.
             </h3>
       
             {/* Retry and Home buttons */}
@@ -257,8 +300,9 @@ useEffect(() => {
                   setElapsedTime(0); // Reset the timer
                   setPLayerClimbed(false); // Reset player climbing state
                   setFlagPosition(0); // Reset flag position
-                  setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
-                  startTimer(); // Restart the timer
+                  setBars(generateBars(7)); // Generate new bars with the first index grayscale-0
+                  setIsModalOpen(true);
+                  setScore(0);
                 }}
               />
               <Image
@@ -308,9 +352,10 @@ useEffect(() => {
               <span className="text-red-700 font-semibold mx-1">{formatTime(elapsedTime)}</span>
             </h1>
       
-            <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-              You have completed this level in: {swapCount} swaps.<br /> Can you complete it in less swaps?
-            </h3>
+            <h1 className="text-4xl mt-4 text-gray-900 font-bold">
+              Score:
+              <span className="text-yellow-400 font-semibold mx-1">{score}</span>
+            </h1>
       
             <div className="flex mt-6">
               <Image
@@ -326,8 +371,9 @@ useEffect(() => {
                   setElapsedTime(0); // Reset the timer
                   setPLayerClimbed(false); // Reset player climbing state
                   setFlagPosition(0); // Reset flag position
-                  setBars(generateBars(8)); // Generate new bars with the first index grayscale-0
-                  startTimer(); // Restart the timer
+                  setBars(generateBars(7)); // Generate new bars with the first index grayscale-0
+                  setIsModalOpen(true);
+                  setScore(0);
                 }}
               />
               <Image

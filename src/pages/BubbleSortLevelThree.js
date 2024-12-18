@@ -10,14 +10,14 @@ const BubbleSortLevelThree = () => {
   const [currentCompare, setCurrentCompare] = useState([0, 1]);
   const [isSorted, setIsSorted] = useState(false);
   const [error, setError] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0); // Timer in seconds
+  const [elapsedTime, setElapsedTime] = useState(90); // Timer in seconds
   const [timerInterval, setTimerInterval] = useState(null); // Store interval for clearing it
   const [lives, setLives] = useState(3); // Tracking lives
   const [flagPosition, setFlagPosition] = useState(0); // Track flag position
-  const [swapCount, setSwapCount] = useState(0);
    const [playerClimbed, setPLayerClimbed] = useState(false);
      const [isModalOpen, setIsModalOpen] = useState(true);
      const [score, setScore] = useState(0); // Add a score state
+     const [shuffleInterval, setShuffleInterval] = useState(null); // Store shuffle interval
 
   const generateBars = (count) => {
     const uniqueHeights = new Set();
@@ -35,18 +35,31 @@ const BubbleSortLevelThree = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setElapsedTime(90); // Start with 45 seconds
+    startTimer();
+    startShuffle(); // Start shuffling bars
   };
 
   useEffect(() => {
-    setBars(generateBars(10));
-    startTimer();
+    setBars(generateBars(6));
+    setIsModalOpen(true);
   }, []);
 
   const startTimer = () => {
     if (timerInterval) return; // Prevent starting multiple intervals
-
+  
     const interval = setInterval(() => {
-      setElapsedTime((prev) => prev + 1); // Increment the time every second
+      setElapsedTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval); // Stop timer when it reaches 0
+          setTimerInterval(null);
+          stopTimer();
+          // Trigger failure modal
+          setLives(0);
+          return 0;
+        }
+        return prev - 1; // Decrement time
+      });
     }, 1000);
     setTimerInterval(interval); // Store the interval ID to clear it later
   };
@@ -54,6 +67,24 @@ const BubbleSortLevelThree = () => {
   const stopTimer = () => {
     clearInterval(timerInterval);
     setTimerInterval(null);
+  };
+
+  const startShuffle = () => {
+    const interval = setInterval(() => {
+      setBars((prevBars) => {
+        if (prevBars.length > 0) {
+          const randomIndex = Math.floor(Math.random() * prevBars.length);
+          const shuffledBars = [...prevBars];
+          shuffledBars[randomIndex] = {
+            ...shuffledBars[randomIndex],
+            value: Math.floor(Math.random() * 100) + 30, // Randomize bar value
+          };
+          return shuffledBars;
+        }
+        return prevBars;
+      });
+    }, 10000); // Shuffle every 10 seconds
+    setShuffleInterval(interval); // Store shuffle interval
   };
 
   const formatTime = (timeInSeconds) => {
@@ -90,7 +121,6 @@ const BubbleSortLevelThree = () => {
       if (action === "swap") {
         // Swap values of the two bars being compared
         [newBars[i], newBars[j]] = [newBars[j], newBars[i]];
-        setSwapCount((prevCount) => prevCount + 1);
         setScore((prevScore) => prevScore + 10); // Add points for correct swap
       }
 
@@ -180,13 +210,13 @@ useEffect(() => {
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="relative">
             <Image
-              src="/bubblesort-level3-modal.png"
+              src="/bubblesort-level3-modal-new.png"
               alt="Bubble Sort Modal"
               width={900}
               height={900}
               className="cursor-pointer rounded-2xl"
             />
-            <button className="bg-green-500 text-white font-semibold p-3 absolute bottom-[11%] left-[45%] z-20 rounded-xl cursor-pointer" onClick={closeModal}>Save the princess!</button>
+            <button className="bg-green-500 text-white font-semibold p-3 absolute bottom-[25%] left-[40%] z-20 rounded-xl cursor-pointer" onClick={closeModal}>Save the princess!</button>
           </div>
         </div>
       )}
@@ -279,7 +309,7 @@ useEffect(() => {
       </div>
 
   {/* Completion screen */}
-  {(lives === 0 || (bars.length > 0 && bars.every(bar => bar.grayscale === 1))) && (
+  {(lives === 0 && elapsedTime === 0 || (bars.length > 0 && bars.every(bar => bar.grayscale === 1))) && (
   <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div
       className="w-full h-full flex flex-col items-center justify-center p-12 bg-cover bg-no-repeat rounded-md"
@@ -295,7 +325,7 @@ useEffect(() => {
       </h1>
 
       <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-        Oops! Please try again or go back to practise game.
+        Oops! You could not made it this time.
       </h3>
 
       {/* Retry and Home buttons */}
@@ -310,11 +340,12 @@ useEffect(() => {
             setLives(3); // Reset lives
             setIsSorted(false); // Reset the sorted flag
             setCurrentCompare(0); // Reset the comparison index to the start
-            setElapsedTime(0); // Reset the timer
+            setElapsedTime(90); // Reset the timer
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
-            setBars(generateBars(10)); // Generate new bars with the first index grayscale-0
-            startTimer(); // Restart the timer
+            setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+            setIsModalOpen(true);
+            setScore(0);
           }}
         />
         <Image
@@ -344,14 +375,14 @@ useEffect(() => {
       }}
     >
      {/* Conditional star display */}
-     {lives === 1 || elapsedTime > 45 ? (
+     {lives === 1 || elapsedTime > 75 ? (
         <Image src="/star.png" width={250} height={100} alt="1 star" />
-      ) : lives === 2 || (elapsedTime > 30 && elapsedTime <= 45) ? (
+      ) : lives === 2 || (elapsedTime > 40 && elapsedTime <= 75) ? (
         <div className="flex justify-between">
           <Image src="/star.png" width={250} height={100} alt="2 stars" />
           <Image src="/star.png" width={250} height={100} alt="2 stars" />
         </div>
-      ) : lives === 3 && elapsedTime < 30 ? (
+      ) : lives === 3 && elapsedTime < 40 ? (
         <div className="flex justify-between">
           <Image src="/star.png" width={250} height={100} alt="3 stars" />
           <Image src="/star.png" width={250} height={100} alt="3 stars" />
@@ -363,10 +394,6 @@ useEffect(() => {
         TIME:
         <span className="text-red-700 font-semibold mx-1">{formatTime(elapsedTime)}</span>
       </h1>
-
-      <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-        You have completed this level in: {swapCount} swaps.<br /> Can you complete it in less swaps?
-      </h3>
 
       <h1 className="text-4xl mt-4 text-gray-900 font-bold">
         Score:
@@ -384,11 +411,12 @@ useEffect(() => {
             setLives(3); // Reset lives
             setIsSorted(false); // Reset the sorted flag
             setCurrentCompare(0); // Reset the comparison index to the start
-            setElapsedTime(0); // Reset the timer
+            setElapsedTime(90); // Reset the timer
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
-            setBars(generateBars(10)); // Generate new bars with the first index grayscale-0
-            startTimer(); // Restart the timer
+            setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
+            setIsModalOpen(true);
+            setScore(0);
           }}
         />
         <Image

@@ -15,13 +15,19 @@ const SelectionSortLevelOne = () => {
   const [playerY, setPlayerY] = useState(0); // Initial Y position of the player
   const [flagPosition, setFlagPosition] = useState(0); // Track flag position
   const [playerClimbed, setPLayerClimbed] = useState(false);
+   const [isModalOpen, setIsModalOpen] = useState(true);
+    const [score, setScore] = useState(0);
  
 
-  // Generate initial bars on mount
-  useEffect(() => {
-    setBars(generateBars(6));
-    startTimer(); // Start the timer when the component loads
-  }, []);
+ const closeModal = () => {
+     setIsModalOpen(false);
+     startTimer();
+   };
+ 
+   useEffect(() => {
+     setBars(generateBars(6));
+   }, []);
+
 
   const generateBars = (count) =>
     Array.from({ length: count }, (_, index) => ({
@@ -53,6 +59,7 @@ const SelectionSortLevelOne = () => {
   const triggerError = () => {
     setErrorState(true);
     setLives((prev) => prev - 1);
+    setScore((prevScore) => prevScore - 5);
 
     // Remove the flicker effect after a short delay
     setTimeout(() => {
@@ -77,6 +84,7 @@ const SelectionSortLevelOne = () => {
         if (index <= sortedRoundIndex) {
           bar.sorted = true;
           bar.image = "/brick-sorted.png"; // Mark as sorted
+          setScore((prevScore) => prevScore + 10);
         } else {
           bar.image = "/brick1.png"; // Reset other bars
           bar.sorted = false;
@@ -149,6 +157,7 @@ const SelectionSortLevelOne = () => {
 
   } else {
     // Move to the next bar for comparison
+    setScore((prevScore) => prevScore + 10);
     setCurrentCompare((prev) => Math.min(prev + 1, bars.length - 1));
   }
   };
@@ -165,6 +174,7 @@ const SelectionSortLevelOne = () => {
       handleSwapAndRestart(); // Swap and restart for the next round
     } else {
       // Move to the next bar
+      setScore((prevScore) => prevScore + 10);
       setCurrentCompare((prev) => Math.min(prev + 1, bars.length - 1));
     }
   };
@@ -208,6 +218,22 @@ const SelectionSortLevelOne = () => {
       }`}
       style={{ backgroundImage: "url('/sort-levels-bg.png')" }}
     >
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative">
+            <Image
+              src="/bubblesort-level1-modal.png"
+              alt="Bubble Sort Modal"
+              width={900}
+              height={900}
+              className="cursor-pointer rounded-2xl"
+            />
+            <button className="bg-green-500 text-white font-semibold p-3 absolute bottom-[11%] left-[45%] z-20 rounded-xl cursor-pointer" onClick={closeModal}>Save the princess!</button>
+          </div>
+        </div>
+      )}
+
       {/* Timer display */}
       <div className="absolute top-0 left-0 w-full text-center text-red-600 font-bold text-2xl p-2">
         {formatTime(elapsedTime)}
@@ -226,6 +252,13 @@ const SelectionSortLevelOne = () => {
             className={lives <= index ? "grayscale" : ""}
           />
         ))}
+      </div>
+
+      {/* Display Score */}
+      <div className="absolute top-0 right-0 p-4 flex gap-2">
+        <h1 className="text-2xl font-semibold mx-2">Score: 
+          <span className="text-red-600">{score}</span>
+        </h1>
       </div>
 
       {/* Player Image */}
@@ -324,7 +357,8 @@ const SelectionSortLevelOne = () => {
                         setPLayerClimbed(false); // Reset player climbing state
                         setFlagPosition(0); // Reset flag position
                         setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
-                        startTimer(); // Restart the timer
+                        setIsModalOpen(true);
+                        setScore(0);
                       }}
                     />
                     <Image
@@ -374,9 +408,10 @@ const SelectionSortLevelOne = () => {
                     <span className="text-red-700 font-semibold mx-1">{formatTime(elapsedTime)}</span>
                   </h1>
             
-                  <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-                    You have completed this level successfully!
-                  </h3>
+                  <h1 className="text-4xl mt-4 text-gray-900 font-bold">
+                    Score:
+                    <span className="text-yellow-400 font-semibold mx-1">{score}</span>
+                  </h1>
             
                   <div className="flex mt-6">
                     <Image
@@ -393,7 +428,8 @@ const SelectionSortLevelOne = () => {
                         setPLayerClimbed(false); // Reset player climbing state
                         setFlagPosition(0); // Reset flag position
                         setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
-                        startTimer(); // Restart the timer
+                        setIsModalOpen(true);
+                        setScore(0);
                       }}
                     />
                     <Image
@@ -412,7 +448,7 @@ const SelectionSortLevelOne = () => {
                       height={150}
                       alt="Next"
                       className="cursor-pointer"
-                      onClick={() => router.push("/SelectionSortLevelThree")}
+                      onClick={() => router.push("/SelectionSortLeveloOne")}
                     />
                   </div>
                 </div>

@@ -14,7 +14,6 @@ const BubbleSortLevelOne = () => {
   const [timerInterval, setTimerInterval] = useState(null); // Store interval for clearing it
   const [lives, setLives] = useState(3); // Tracking lives
   const [flagPosition, setFlagPosition] = useState(0); // Track flag position
-  const [swapCount, setSwapCount] = useState(0);
   const [playerClimbed, setPLayerClimbed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [score, setScore] = useState(0); // Add a score state
@@ -36,11 +35,11 @@ const BubbleSortLevelOne = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    startTimer();
   };
 
   useEffect(() => {
     setBars(generateBars(6));
-    startTimer();
   }, []);
 
   const startTimer = () => {
@@ -91,7 +90,6 @@ const BubbleSortLevelOne = () => {
       if (action === "swap") {
         // Swap values of the two bars being compared
         [newBars[i], newBars[j]] = [newBars[j], newBars[i]];
-        setSwapCount((prevCount) => prevCount + 1);
         setScore((prevScore) => prevScore + 10); // Add points for correct swap
       }
 
@@ -316,7 +314,8 @@ useEffect(() => {
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
             setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
-            startTimer(); // Restart the timer
+            setIsModalOpen(true);
+            setScore(0);
           }}
         />
         <Image
@@ -366,10 +365,6 @@ useEffect(() => {
         <span className="text-red-700 font-semibold mx-1">{formatTime(elapsedTime)}</span>
       </h1>
 
-      <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
-        You have completed this level in: {swapCount} swaps.<br /> Can you complete it in less swaps?
-      </h3>
-
       <h1 className="text-4xl mt-4 text-gray-900 font-bold">
         Score:
         <span className="text-yellow-400 font-semibold mx-1">{score}</span>
@@ -390,7 +385,8 @@ useEffect(() => {
             setPLayerClimbed(false); // Reset player climbing state
             setFlagPosition(0); // Reset flag position
             setBars(generateBars(6)); // Generate new bars with the first index grayscale-0
-            startTimer(); // Restart the timer
+            setIsModalOpen(true);
+            setScore(0);
           }}
         />
         <Image
