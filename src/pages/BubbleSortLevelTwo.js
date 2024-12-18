@@ -16,6 +16,8 @@ const BubbleSortLevelTwo = () => {
   const [flagPosition, setFlagPosition] = useState(0); // Track flag position
   const [swapCount, setSwapCount] = useState(0);
   const [playerClimbed, setPLayerClimbed] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [score, setScore] = useState(0); // Add a score state
 
   const generateBars = (count) => {
     const uniqueHeights = new Set();
@@ -35,6 +37,10 @@ const BubbleSortLevelTwo = () => {
     setBars(generateBars(8));
     startTimer();
   }, []);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const startTimer = () => {
     if (timerInterval) return; // Prevent starting multiple intervals
@@ -86,6 +92,7 @@ const BubbleSortLevelTwo = () => {
         // Swap values of the two bars being compared
         [newBars[i], newBars[j]] = [newBars[j], newBars[i]];
         setSwapCount((prevCount) => prevCount + 1);
+        setScore((prevScore) => prevScore + 10); // Add points for correct swap
       }
 
       // Update the next pair of bars to be compared
@@ -140,6 +147,7 @@ const BubbleSortLevelTwo = () => {
         }
         return newLives;
       });
+      setScore((prevScore) => prevScore - 5); // Deduct points for incorrect swap
       setTimeout(() => setError(false), 1000);
     }
   };
@@ -168,6 +176,21 @@ useEffect(() => {
       className={`relative w-full h-screen bg-cover bg-center overflow-hidden ${error ? "border-4 border-red-500 animate-pulse" : ""}`}
       style={{ backgroundImage: "url('/sort-levels-bg.png')" }}
     >
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative">
+            <Image
+              src="/bubblesort-level2-modal.png"
+              alt="Bubble Sort Modal"
+              width={900}
+              height={900}
+              className="cursor-pointer rounded-2xl"
+            />
+            <button className="bg-green-500 text-white font-semibold p-3 absolute bottom-[11%] left-[45%] z-20 rounded-xl cursor-pointer" onClick={closeModal}>Save the princess!</button>
+          </div>
+        </div>
+      )}
       {/* Timer display */}
       <div className="absolute top-0 left-0 w-full text-center text-red-600 font-bold text-2xl p-2">
         {formatTime(elapsedTime)}
@@ -188,6 +211,12 @@ useEffect(() => {
         ))}
       </div>
 
+ {/* Display Score */}
+ <div className="absolute top-0 right-0 p-4 flex gap-2">
+        <h1 className="text-2xl font-semibold mx-2">Score: 
+          <span className="text-red-600">{score}</span>
+        </h1>
+      </div>
      
        {/* Winning flag */}
       <Image
@@ -338,6 +367,11 @@ useEffect(() => {
       <h3 className="text-yellow-400 text-2xl font-semibold ml-20 my-4">
         You have completed this level in: {swapCount} swaps.<br /> Can you complete it in less swaps?
       </h3>
+
+      <h1 className="text-4xl mt-4 text-gray-900 font-bold">
+        Score:
+        <span className="text-yellow-400 font-semibold mx-1">{score}</span>
+      </h1>
 
       <div className="flex mt-6">
         <Image

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import "../app/globals.css"
+import "../app/globals.css";
 
 const SelectionSortPractise = () => {
   const router = useRouter();
@@ -17,13 +17,26 @@ const SelectionSortPractise = () => {
     "/old numbers/2.png",
     "/old numbers/1.png",
   ];
+    // Feedback image paths
+const feedbackImages = {
+  correct: "/yellow-star.webp",
+  incorrect: "/red-cross.webp",
+};
 
-  // Set numbers as the images directly
   const [numbers, setNumbers] = useState(images);
   const [currentIndex, setCurrentIndex] = useState(0); // Start from the first image
-  const [sortedIndexes, setSortedIndexes] = useState([]); // Track sorted images
+  const [sortedIndex, setSortedIndex] = useState(-1); // Index of the currently sorted image
+  const [currentRoundStart, setCurrentRoundStart] = useState(0); // Tracks the start of the unsorted portion
   const [message, setMessage] = useState("Initialize the first unsorted number as the key.");
   const [feedbackImage, setFeedbackImage] = useState(""); // Feedback image (error or success)
+  
+  const [isNextEnabled, setIsNextEnabled] = useState(true);
+  const [isSelectEnabled, setIsSelectEnabled] = useState(false);
+  const [isSkipEnabled, setIsSkipEnabled] = useState(false);
+
+  // State to track green-highlighted indices
+const [greenIndices, setGreenIndices] = useState([]);
+
 
   const handleOptionClick = (algorithm) => {
     setSelectedAlgorithm(algorithm);
@@ -41,6 +54,119 @@ const SelectionSortPractise = () => {
     setIsModalOpen(false);
   };
 
+  const extractNumber = (imagePath) => {
+    if (!imagePath || typeof imagePath !== "string") {
+      console.error("Invalid image path:", imagePath);
+      return ""; // Return an empty string for invalid input
+    }
+    const match = imagePath.match(/(\d+)\.png$/); // Match the number before ".png"
+    return match ? match[1] : ""; // Return the matched number or an empty string
+  };
+  
+  
+
+  const handleNextClick = () => {
+    if (message === "Congratulations! The images are sorted.") {
+      // If the sorting is completed, navigate to the next page
+      router.push("/selectionsortChallenge");
+    } else {
+    setIsNextEnabled(false);
+    setIsSelectEnabled(true);
+    setIsSkipEnabled(true);
+  }
+  };
+  
+  const handleSelectClick = () => {
+    if (currentIndex === numbers.length) {
+      console.log(`Round completed. Key selected: ${numbers[sortedIndex]}`);
+  
+      // Swap the smallest number (green border) with the first unsorted number (yellow border)
+      const updatedNumbers = [...numbers];
+      const temp = updatedNumbers[currentRoundStart];
+      updatedNumbers[currentRoundStart] = updatedNumbers[sortedIndex];
+      updatedNumbers[sortedIndex] = temp;
+  
+      setNumbers(updatedNumbers); // Update the images
+      setGreenIndices((prev) => [...prev, currentRoundStart]); // Keep the swapped key green
+  
+      if (currentRoundStart === numbers.length - 1) {
+      // All numbers are sorted
+      setGreenIndices(Array.from({ length: numbers.length }, (_, i) => i)); // Set all to green
+      setMessage("Congratulations! The images are sorted.");
+      setIsNextEnabled(true);
+      setIsSelectEnabled(false);
+      setIsSkipEnabled(false);
+    } 
+
+    else{
+      // Move to the next round
+      setCurrentRoundStart((prev) => prev + 1);
+      setCurrentIndex(currentRoundStart + 1);
+      setSortedIndex(-1); // Reset sorted index (remove green border after the round ends)
+  
+      setMessage("Key selected and swapped. Moving to the next round.");
+      setFeedbackImage(feedbackImages.correct);
+    }
+    } else {
+      const selectedNumber = extractNumber(numbers[currentIndex]);
+      const previousKey = extractNumber(numbers[sortedIndex]);
+  
+      // Case for selecting the first element (default key)
+      if (currentIndex === currentRoundStart) {
+        setSortedIndex(currentIndex); // Set the first number as the initial key (green border)
+        setMessage(`Correct! Since ${selectedNumber} is the first number, it is selected as the key.`);
+        setIsNextEnabled(true);
+        setIsSelectEnabled(false);
+        setIsSkipEnabled(false);
+        setFeedbackImage(feedbackImages.correct);
+        setCurrentIndex((prev) => prev + 1); // Move to the next number
+      } else {
+        if (selectedNumber < previousKey) {
+          // If the selected number is less than the previous key (green), it's correct
+          setSortedIndex(currentIndex); // Update the key (highlight with green border)
+          setMessage(
+            `Correct! The number ${selectedNumber} is less than the previously selected key ${previousKey}, so we select it as the new key.`
+          );
+          setCurrentIndex((prev) => prev + 1); // Move to the next number
+          setFeedbackImage(feedbackImages.correct);
+        } else {
+          // If the selected number is greater than the previous key (green), it's incorrect
+          setMessage(
+            `Oops! The number ${selectedNumber} is greater than the previously selected key ${previousKey}, so we must skip it. Try again!`
+          );
+          setFeedbackImage(feedbackImages.incorrect);
+          // Do not increment currentIndex, reattempt with the same index
+        }
+      }
+    }
+  };
+  
+  const handleSkipClick = () => {
+    const selectedNumber = extractNumber(numbers[currentIndex]);
+    const previousKey = extractNumber(numbers[sortedIndex]);
+  
+    if (selectedNumber > previousKey) {
+      // Correct skip
+      setMessage(
+        `Correct! The number ${selectedNumber} is greater than the previously selected key ${previousKey}, so skipping is correct.`
+      );
+      setFeedbackImage(feedbackImages.correct);
+      setCurrentIndex((prev) => prev + 1); // Move to the next number
+    } else {
+      // Incorrect skip
+      setMessage(
+        `Oops! The number ${selectedNumber} is less than the previously selected key ${previousKey}, so we must select it, not skip it. Try again!`
+      );
+      setFeedbackImage(feedbackImages.incorrect);
+      // Do not increment currentIndex, reattempt with the same index
+    }
+  
+    setIsNextEnabled(true);
+    setIsSelectEnabled(false);
+    setIsSkipEnabled(false);
+  };
+
+  
   return (
     <div
       className="relative w-full h-screen bg-cover bg-center"
@@ -61,7 +187,7 @@ const SelectionSortPractise = () => {
           </div>
         </div>
       )}
-      
+
       {/* Sorting Options */}
       <div className="flex space-x-4 text-xl font-semibold py-10 mx-10">
         <div
@@ -109,20 +235,24 @@ const SelectionSortPractise = () => {
           <div className="flex space-x-6 my-5">
             {numbers.map((image, index) => (
               <div
-                key={index}
-                className={`flex items-center justify-center border-4 rounded-full ${
-                  sortedIndexes.includes(index)
-                    ? "border-green-500"
-                    : index === currentIndex
-                    ? "border-yellow-500"
-                    : "border-gray-500"
-                }`}
-              >
-                {/* Display Image */}
+              key={index}
+              className={`flex items-center justify-center border-4 rounded-full ${
+                greenIndices.includes(index)
+                  ? "border-green-500" // Already sorted (green border)
+                  : index === sortedIndex
+                  ? "border-green-500" // Currently sorted (green border)
+                  : index === currentIndex
+                  ? "border-yellow-500" // Current image being compared
+                  : index < currentRoundStart
+                  ? "border-gray-400" // Already sorted in previous rounds
+                  : "border-gray-500" // Unsorted images
+              }`}
+            >
+            
                 <Image
                   width={64}
                   height={64}
-                  src={image} // Use the image directly
+                  src={image}
                   alt={`Number ${index + 1}`}
                   className="rounded-full"
                 />
@@ -132,13 +262,17 @@ const SelectionSortPractise = () => {
 
           <div className="flex space-x-10 mt-6">
             <button
-             
+              onClick={handleSelectClick}
+              disabled={!isSelectEnabled}
+              style={{ opacity: isSelectEnabled ? 1 : 0.5 }}
             >
               <Image src="/select.png" width={200} height={200} alt="Select" />
             </button>
 
             <button
-             
+              onClick={handleSkipClick}
+              disabled={!isSkipEnabled}
+              style={{ opacity: isSkipEnabled ? 1 : 0.5 }}
             >
               <Image src="/skip.png" width={200} height={200} alt="Skip" />
             </button>
@@ -154,7 +288,9 @@ const SelectionSortPractise = () => {
           )}
 
           <button
-            
+            onClick={handleNextClick}
+            disabled={!isNextEnabled}
+            style={{ opacity: isNextEnabled ? 1 : 0.5 }}
           >
             <Image src="/next.png" width={150} height={150} alt="Next" />
           </button>

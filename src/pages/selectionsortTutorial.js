@@ -105,7 +105,7 @@ const SelectionSortTutorial = () => {
             {/* Video Element */}
             <video
               className="absolute inset-0 w-full h-full object-cover rounded-md"
-              src="/tutorial-video.mp4"
+              src="/selectionsort-tutorial-video.mp4"
               type="video/mp4"
               controls
               autoPlay
