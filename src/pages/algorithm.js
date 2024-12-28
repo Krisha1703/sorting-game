@@ -1,33 +1,21 @@
-"use client";
-
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../app/globals.css";
 import Image from "next/image";
+import SortingAlgorithmSelector from "@/components/SortingAlgorithmSelector";
 
 const Algorithm = () => {
-  // State to track the selected algorithm
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort");
-
-  // Router instance to handle navigation
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState("Bubble Sort"); // Track selected algorithm
   const router = useRouter();
-
-  // Handle click on an image option
-  const handleOptionClick = (algorithm) => {
-    setSelectedAlgorithm(algorithm); // Update selected algorithm
-  };
 
   // Handle "Next" button click
   const handleNextClick = () => {
     switch (selectedAlgorithm) {
       case "Bubble Sort":
-        router.push("/bubblesortTutorial");
+        router.push(`/SortingTutorialPage?algorithm=${encodeURIComponent(selectedAlgorithm)}`);
         break;
       case "Insertion Sort":
-        router.push("/insertionsortTutorial");
-        break;
-      case "Selection Sort":
-        router.push("/selectionsortTutorial");
+        router.push(`/SortingTutorialPage?algorithm=${encodeURIComponent(selectedAlgorithm)}`);
         break;
       default:
         break;
@@ -41,59 +29,12 @@ const Algorithm = () => {
     >
       {/* Main Content */}
       <div className="relative z-10 flex flex-col text-white">
-        {/* Sorting Options as Images */}
-        <div className="flex space-x-4 justify-start my-2">
-          {/* Bubble Sort Image */}
-          <div
-            onClick={() => handleOptionClick("Bubble Sort")}
-            className="cursor-pointer"
-          >
-            <Image
-              src={
-                selectedAlgorithm === "Bubble Sort"
-                  ? "/Bubble Sort_AF.png"
-                  : "/Bubble Sort_BF.png"
-              }
-              width={250}
-              height={250}
-              alt="Bubble Sort"
-            />
-          </div>
-
-          {/* Insertion Sort Image */}
-          <div
-            onClick={() => handleOptionClick("Insertion Sort")}
-            className="cursor-pointer"
-          >
-            <Image
-              src={
-                selectedAlgorithm === "Insertion Sort"
-                  ? "/Insertion Sort_AF.png"
-                  : "/Insertion Sort_BF.png"
-              }
-              width={250}
-              height={250}
-              alt="Insertion Sort"
-            />
-          </div>
-
-          {/* Selection Sort Image */}
-          <div
-            onClick={() => handleOptionClick("Selection Sort")}
-            className="cursor-pointer"
-          >
-            <Image
-              src={
-                selectedAlgorithm === "Selection Sort"
-                  ? "/Selection Sort_AF.png"
-                  : "/Selection Sort_BF.png"
-              }
-              width={250}
-              height={250}
-              alt="Selection Sort"
-            />
-          </div>
-        </div>
+        {/* Sorting Options */}
+        <SortingAlgorithmSelector
+          selectedAlgorithm={selectedAlgorithm}
+          onAlgorithmSelect={setSelectedAlgorithm}
+          isOtherAlgorithmSelected={false} // Default algorithm (Bubble Sort)
+        />
 
         {/* Green box displaying selected algorithm and Next button */}
         {selectedAlgorithm && (
