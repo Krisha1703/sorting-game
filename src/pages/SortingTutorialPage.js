@@ -31,12 +31,6 @@ const SortingTutorialPage = () => {
       videoSrc: "/insertionsort-tutorial-video.mp4",
       practiceLink: "/InsertionSort/Practise/InsertionSortPractise",
     },
-    "Selection Sort": {
-      description:
-        "Selection Sort is a step-by-step algorithm that sorts elements by repeatedly selecting the smallest (or largest) item from the unsorted portion and swapping it with the first unsorted item. Imagine sorting a deck of cards: you find the smallest card, place it in its correct position, and repeat the process until the deck is fully sorted.",
-      videoSrc: "/selectionsort-tutorial-video.mp4",
-      practiceLink: "/SelectionSort/Practise/SelectionSortPractise",
-    },
   };
 
   // Get the data for the currently selected algorithm
