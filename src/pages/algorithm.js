@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import "../app/globals.css";
 import Image from "next/image";
 import SortingAlgorithmSelector from "@/components/SortingAlgorithmSelector";

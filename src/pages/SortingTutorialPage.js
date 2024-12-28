@@ -1,23 +1,18 @@
 import SortingTutorial from "@/components/SortingTutorialComponent";
 import SortingAlgorithmSelector from "@/components/SortingAlgorithmSelector";
-import { useState, useEffect } from "react";
-import "../app/globals.css";
+import { useState } from "react";
 import { useRouter } from "next/router";
+import "../app/globals.css";
 
-const SortingTutorialPage = () => {
-  const router = useRouter();
-  const { algorithm } = router.query;
-  console.log(algorithm);
-   // Update the selected algorithm when the query is available
-   useEffect(() => {
-    if (algorithm) {
-      setSelectedAlgorithm(algorithm);
-    }
-  }, [algorithm]);
+// Server-side function to fetch the query parameter
+export async function getServerSideProps(context) {
+  const { algorithm } = context.query;
 
-   const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithm); // Track selected algorithm
+  // Check if algorithm is provided, otherwise fallback to default
+  const defaultAlgorithm = "Bubble Sort"; // Default algorithm if none is provided
+  const selectedAlgorithm = algorithm || defaultAlgorithm;
 
-   // Data for each algorithm
+  // Data for each algorithm
   const algorithmData = {
     "Bubble Sort": {
       description:
@@ -33,12 +28,27 @@ const SortingTutorialPage = () => {
     },
   };
 
-  // Get the data for the currently selected algorithm
-   // Get the data for the currently selected algorithm
-   const { description, videoSrc, practiceLink } =
-   algorithmData[selectedAlgorithm] || {};
-  
-   return (
+  const algorithmDataForSelected = algorithmData[selectedAlgorithm] || null;
+
+  return {
+    props: {
+      selectedAlgorithm,
+      algorithmData: algorithmDataForSelected,
+    },
+  };
+}
+
+const SortingTutorialPage = ({ selectedAlgorithm, algorithmData }) => {
+  const router = useRouter();
+
+  // If algorithmData is not available, show an error or fallback message
+  if (!algorithmData) {
+    return <div>Algorithm not found.</div>;
+  }
+
+  const { description, videoSrc, practiceLink } = algorithmData;
+
+  return (
     <div
       className="relative w-full h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/algorithms-bg.png')" }}
@@ -46,7 +56,7 @@ const SortingTutorialPage = () => {
       {/* Sorting Options */}
       <SortingAlgorithmSelector
         selectedAlgorithm={selectedAlgorithm}
-        onAlgorithmSelect={setSelectedAlgorithm}
+        onAlgorithmSelect={(algorithm) => router.push(`/SortingTutorialPage?algorithm=${algorithm}`)}
       />
 
       {/* Sorting Tutorial Content */}
