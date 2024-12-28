@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../app/globals.css";
+import "../../../app/global.css";
 import { useRouter } from "next/router";
 import { 
   LevelModal, 
